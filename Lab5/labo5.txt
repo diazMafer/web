@@ -1,0 +1,72 @@
+<html>
+    <body>
+
+
+        <script>
+            const messages = document.createElement("ul");
+            const sendContainer = document.createElement("div")
+
+            const textarea = document.createElement("textarea")
+            const button = document.createElement("button")
+            
+            button.append("Enviar")
+
+            document.body.append(messages)
+            sendContainer.append(textarea)
+            sendContainer.append(button)
+
+            sendContainer.style = `
+                display: flex;
+            `
+            document.body.append(sendContainer)
+
+            function getMessages(){
+                
+
+                fetch('http://msdeus.site:7000', {
+                    method: 'GET'
+                }).then(response => {
+                    // console.log("After fetch", response)
+                    return response.json()
+                }).then(response => {
+                    messages.innerHTML = ""
+                    response.forEach(element => {
+                        console.log('response', response)
+                        const li = document.createElement("li")
+                        const strong = document.createElement("strong")
+                        strong.append(element.username + ": ")
+                        li.append(strong)
+                        li.append(element.chatmessage)
+
+                        messages.append(li)
+                    });
+                })
+            }
+
+            getMessages()
+            
+
+            button.onclick = function() {
+                const val = textarea.value.trim()
+
+                console.log('clicked...')
+                fetch('http://msdeus.site:7000', {
+                    method: 'POST',
+                    body: `
+                        {
+                            "username": "Amigo",
+                            "chatmessage": "${val}"
+                        }
+                    `
+                }).then(() => {
+                    getMessages()
+
+                    
+                })
+            }
+
+            setInterval(getMessages, 5000)
+
+        </script>
+    </body>
+</html>

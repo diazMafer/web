@@ -1,0 +1,229 @@
+<html>
+    <body>
+
+
+        <script>
+            const messages = document.createElement("ul");
+            const sendContainer = document.createElement("div")
+            const container = document.createElement("div")
+            const textarea = document.createElement("textarea")
+            const button = document.createElement("button")
+            const iframe = document.createElement("iframe");
+            const br = document.createElement("br");
+            const image = document.createElement("img");
+            const id = 0
+            const user = "Mafs"
+            //const iframe = document.createElement("iframe")
+            
+            //messages style 
+            messages.style = "list-style-type: none;";
+
+            //textarea style 
+           
+            textarea.maxLength = 140
+            textarea.style = `
+                        width: 90%;
+                        height: 20%;
+                        border-radius: 20px;
+                                                
+            `
+
+            //container of messages style
+            container.style = `
+                        background-image: url("background.png");
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                        width: 100%;
+                        max-height: 800px;
+                        word-wrap: break-word;
+                        overflow-y: scroll;
+                                                
+            `
+
+            //buton style
+            button.style = `
+                        background: orange;
+                        width: 10%;
+                        border-radius: 20px;
+                                                
+            `
+
+            button.append("Enviar")
+
+            document.body.append(container)
+            container.append(messages)
+            sendContainer.append(textarea)
+            sendContainer.append(button)
+
+            sendContainer.style = `
+                display: flex;
+            `
+            document.body.append(sendContainer)
+
+
+            /*
+            function checkUrl(string){            
+                var regex = /(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,63}(:[0-9]{1,5})?(\/.*)?/;
+                return regex.test(string) ? string.match(regex)[0] : false;
+            }
+
+            function checkTextareaUrl(string, li){
+
+                var url = checkUrl(string);
+
+                if (url)
+                {
+                    // Action when an url is found
+                    iframe.src = string;
+                    const br = document.createElement("br");
+                    li.append(iframe);
+                    li.append(br);
+                }
+                else
+                {
+                    return string
+                }
+
+                return string
+            }
+            */
+
+            function getMessages(){
+                
+
+                fetch('http://msdeus.site:7000', {
+                    method: 'GET'
+                }).then(response => {
+                    // console.log("After fetch", response)
+                    return response.json()
+                }).then(response => {
+                    messages.innerHTML = ""
+                    response.forEach(element => {
+                            const li = document.createElement("li")
+                            const strong = document.createElement("strong")
+                            const bubble = document.createElement("div");
+
+                            //li style 
+                            li.style = `
+                                clear: both;
+                                float: left;
+                                margin: 0.4em 0.4em 1.2em auto;
+                                border-radius: 10px;
+                                background: white;
+                                border: 1px solid white;
+                                box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+                                padding: 15px;
+                                position: relative;
+
+                            `
+
+                            bubble.style = `
+                                border-left: 21px solid transparent;
+                                border-top: 20px solid rgba(0, 0, 0, 0.2);
+                                bottom: -25px;
+                                position: absolute;
+                                left: 15px;
+                                transform: scaleX(-1);
+                                
+                            `
+                            if(element.username === user){
+                                //li style 
+                                li.style = `
+                                    clear: both;
+                                    float: right;
+                                    margin: 0.4em 0.4em 1.2em auto;
+                                  
+                                    border-radius: 10px;
+                                    background: #9BC6E2;
+                                    border: 1px solid #9BC6E2;
+                                    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+                                    padding: 15px;
+                                    position: relative;
+
+                                `
+
+                                bubble.style = `
+                                    border-left: 21px solid transparent;
+                                    border-top: 20px solid rgba(0, 0, 0, 0.2);
+                                    bottom: -25px;
+                                    position: absolute;
+                                    right: 15px;
+                                    
+                                    
+                                `
+                                //container.scrollTop = container.scrollHeight
+                                //document.body.scrollTop = document.body.scrollHeight
+
+                            }
+
+                            strong.append(element.username + ": ")
+                            li.append(strong)
+                            li.append(bubble)
+                            li.append(checkTextareaUrl(element.chatmessage, li))
+                            messages.append(li)
+                            container.scrollTop = container.scrollHeight
+                            document.body.scrollTop = document.body.scrollHeight
+                            
+                    });
+                    
+                })
+            }
+
+            getMessages()
+            
+         
+            
+
+            //event Listener para enviar mensaje al apachar enter
+            textarea.addEventListener("keydown", function(event) {
+                if(event.key === "Enter"){
+                    event.preventDefault();
+                    const val = textarea.value.trim()
+
+                    console.log('clicked...')
+                    fetch('http://msdeus.site:7000', {
+                        method: 'POST',
+                        body: `
+                            {
+                                "username": "${user}",
+                                "chatmessage": "${val}"
+                            }
+                        `
+                    }).then(() => {
+                        getMessages()
+                        textarea.value = '';
+
+                        
+                    })
+                }
+                
+            })
+
+            button.onclick = function() {
+                const val = textarea.value.trim()
+
+                console.log('clicked...')
+                fetch('http://msdeus.site:7000', {
+                    method: 'POST',
+                    body: `
+                        {
+                            "username": "${user}",
+                            "chatmessage": "${val}"
+                        }
+                    `
+                }).then(() => {
+                    getMessages()
+                    textarea.value = '';
+
+                    
+                })
+
+                
+            }
+
+           
+            setInterval(getMessages, 3000)
+
+        </script>
+    </body>
+</html>
