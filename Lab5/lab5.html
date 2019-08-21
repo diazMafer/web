@@ -10,8 +10,9 @@
             const button = document.createElement("button")
             const iframe = document.createElement("iframe")
             const br = document.createElement("br")
+            
             const user = "Mafs"
-           
+            //const iframe = document.createElement("iframe")
             
             //messages style 
             messages.style = "list-style-type: none;";
@@ -23,7 +24,9 @@
                         width: 90%;
                         height: 20%;
                         border: 2px solid skyblue;
-                        background: white;
+                        background-image: url("background.png");
+                        background-repeat: no-repeat;
+                        background-size: cover;
                         maring-top: 10px;
 
                         
@@ -42,7 +45,7 @@
 
             //buton style
             button.style = `
-                        background:  #63E2FF ;
+                        background:  skyblue;
                         width: 10%;
                         height: 40px;
                         border-radius: 100px;
@@ -60,7 +63,7 @@
             container.append(messages)
             sendContainer.append(textarea)
             sendContainer.append(button)
-            sendContainer.append(p)
+          
             
 
             sendContainer.style = `
@@ -171,11 +174,12 @@
 
                             }
 
-                            strong.append(element.username + ": ")      
+                            strong.append(element.username + ": ")
+                            
+                                    
                             li.append(strong)
                             li.append(br)
                             li.append(bubble)
-                            li.append(br)
                             li.append(checkTextareaUrl(element.chatmessage, li))
                             messages.append(li)
                             container.scrollTop = container.scrollHeight
@@ -189,21 +193,12 @@
             getMessages()
             
          
-            function lenght(textarea){
-                if (textarea.lenght > textarea.maxLength){
-                    p.append("El máximo de caracteres permitidos es 140")
-                    return false
-                } else {
-                    return true
-                }
-
-                
-            }
+        
 
             //event Listener para enviar mensaje al apachar enter
             textarea.addEventListener("keydown", function(event) {
                 if(event.key === "Enter"){
-                    event.preventDefault();
+                    event.preventDefault()
                     const val = textarea.value.trim()
 
                     console.log('clicked...')
@@ -217,7 +212,7 @@
                         `
                     }).then(() => {
                         getMessages()
-                        textarea.value = '';
+                        textarea.value = ''
 
                         
                     })
@@ -227,9 +222,9 @@
 
             button.onclick = function() {
                 const val = textarea.value.trim()
-                const x = lenght(textarea)
                 
-                if (x) {
+                
+                
                 console.log('clicked...')
                 fetch('http://msdeus.site:7000', {
                     method: 'POST',
@@ -241,17 +236,15 @@
                     `
                 }).then(() => {
                     getMessages()
-                    textarea.value = '';
+                    textarea.value = ''
 
                     
                 })
-                }
-
                 
             }
 
            
-            setInterval(getMessages, 3000)
+            setInterval(getMessages, 5000)
 
         </script>
     </body>
