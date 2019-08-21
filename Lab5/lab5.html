@@ -8,12 +8,10 @@
             const container = document.createElement("div")
             const textarea = document.createElement("textarea")
             const button = document.createElement("button")
-            const iframe = document.createElement("iframe");
-            const br = document.createElement("br");
-            const image = document.createElement("img");
-            const p = document.createElement("p");
+            const iframe = document.createElement("iframe")
+            const br = document.createElement("br")
             const user = "Mafs"
-            //const iframe = document.createElement("iframe")
+           
             
             //messages style 
             messages.style = "list-style-type: none;";
@@ -24,10 +22,8 @@
             textarea.style = `
                         width: 90%;
                         height: 20%;
-                        border: 3px solid white;
-                        background-image: url("background.png");
-                        background-repeat: no-repeat;
-                        background-size: cover;
+                        border: 2px solid skyblue;
+                        background: white
                         maring-top: 10px;
 
                         
@@ -175,12 +171,11 @@
 
                             }
 
-                            strong.append(element.username + ": ")
-                            
-                                    
+                            strong.append(element.username + ": ")      
                             li.append(strong)
-                            
+                            li.append(br)
                             li.append(bubble)
+                            li.append(br)
                             li.append(checkTextareaUrl(element.chatmessage, li))
                             messages.append(li)
                             container.scrollTop = container.scrollHeight
@@ -256,7 +251,7 @@
             }
 
            
-            setInterval(getMessages, 5000)
+            setInterval(getMessages, 3000)
 
         </script>
     </body>
