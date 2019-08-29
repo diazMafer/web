@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Memory game</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin>
+  </head>  
+  <body>
+    <div id="root"></div>
+    <style>
+        
+    </style>
+
+    <script type="text/babel">
+      
+
+      class Header extends React.Component {
+        render() {
+          const style = {
+            height: '50px',
+            border: '1px solid black',
+            color: 'white',
+            display: 'flex',
+            marginBottom: '10px',
+            justifyContent: 'space-between',
+            alingnContent: 'center'          
+          }
+         
+          return <header style={style}>
+                    <div> Juego memoria - Cartoon Network</div>
+                    <div>
+                        <button>Volver a jugar </button>
+                    </div>
+                    <div> Intentos: </div>
+                </header>
+        }
+      }
+      
+      function shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+        return array
+      }
+      
+      const numeroCartas = 20; 
+      function barajear() { 
+          const fontAwesomeClass = iconos()
+          let cartas = []
+
+          while (cartas.length < numeroCartas){
+              const index = Math.floor(Math.random() * fontAwesomeClass.length)
+              const carta = {
+                  icono: fontAwesomeClass.splice(index, 1)[0],
+                  fueAdivinida: false
+
+              }
+
+              cartas.push(carta)
+              //funciona para clonar la carta y que cuando le di click a una no se vaya a voltear ambas cartas
+              cartas.push({...carta})
+          }
+          
+          return shuffle(cartas)
+      }
+
+      function iconos() { return ["fa-rmb", "fa-road", "fa-rocket", "fa-rotate-left", "fa-rotate-right", "fa-rouble", "fa-rss", 
+      "fa-rss-square", "fa-rub", "fa-ruble", "fa-rupee", "fa-save", "fa-scissors", "fa-search", "fa-search-minus", "fa-search-plus", "fa-sellsy", "fa-send", "fa-send-o", 
+      "fa-server", "fa-share", "fa-share-alt", "fa-share-alt-square", "fa-share-square", "fa-share-square-o", "fa-shekel", "fa-sheqel", "fa-shield", "fa-ship", 
+      "fa-shirtsinbulk", "fa-shopping-cart", "fa-sign-in", "fa-sign-out", "fa-signal", "fa-simplybuilt", "fa-sitemap", "fa-skyatlas", "fa-skype", "fa-slack", "fa-sliders", 
+      "fa-slideshare", "fa-smile-o", "fa-soccer-ball-o", "fa-sort", "fa-sort-alpha-asc", "fa-sort-asc", 
+      "fa-sort-desc", "fa-sort-down", "fa-sort-numeric-asc", "fa-sort-numeric-desc", "fa-sort-up", "fa-soundcloud", "fa-space-shuttle", "fa-spinner", "fa-spoon", 
+      "fa-spotify", "fa-square", "fa-square-o", "fa-stack-exchange", "fa-stack-overflow", "fa-star", "fa-star-half", "fa-star-half-empty", "fa-star-half-full", 
+      "fa-star-half-o", "fa-star-o", "fa-steam", "fa-steam-square", "fa-step-backward", "fa-step-forward", "fa-stethoscope", "fa-stop", "fa-street-view", "fa-strikethrough"] }
+      
+      const getEstadoInicial = () => {
+          const baraja = barajear()
+          return {
+              baraja,
+              parejaSeleccionada: [],
+              estaComparando: false
+
+          }
+      }
+      class Tablero extends React.Component {
+        render() {
+          const cartas = [1,2,3,4,5]
+          const style = {
+            color: 'white',
+            width: '700px',
+            height: '600px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            margin: '0 auto',
+            justifyContent: 'space-around'
+
+          }
+          return <div style={style}>
+                    {
+                       this.props.baraja.map((carta, index) => {
+                           //se verifica si la carta que viene esta en el array de parejas seleccionadas por el usuario
+                           const comparada  = this.props.parejaSeleccionada.indexOf(carta) > -1
+                           return  <Carta icono={carta.icono} comparada = {comparada} key={index} seleccionarCarta = {() => this.props.seleccionarCarta(carta, )}
+                                        fueAdivinida = {carta.fueAdivinida}/>
+                       })
+                    }
+                </div>
+        }
+      }
+      
+      class Carta extends React.Component {
+        render() {
+          const style = {
+            width: '125px',
+            height: '125px',
+            perspective: '1000px'
+            
+          }
+
+          const front = {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#ffb300',
+            backfaceVisibility: 'hidden'
+          }
+
+          const back = {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'blue',
+            transform: 'rotateY(180deg)',
+            backfaceVisibility: 'hidden'
+          }
+
+          const inner = {
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            transition: 'transform 0.6s',
+            transformStyle: 'preserve-3d',
+            boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
+          }
+
+          return <div className="flip-card" style={style} onClick={this.props.seleccionarCarta}>
+                    <div className="flip-card-inner" style={inner}
+                         flipped = {this.props.comparada || this.props.fueAdivinida}
+                         disabled = {true}>
+                        <div className = "front" style ={front} />
+                        <div className = "back" style = {back}>
+                            <i className={`fa ${this.props.icono} fa-5x`}></i>
+                        </div>
+                    </div>
+                 </div>
+        }
+      }
+      
+      class Game extends React.Component {
+        constructor(props) {
+          super(props)
+          
+          this.state = getEstadoInicial()
+          
+        }
+
+        render() {
+          const style = {
+            backgroundColor: 'black'
+            
+          }
+          return (
+            <div style={style} >
+              <Header />
+              <Tablero  baraja={this.state.baraja} parejaSeleccionada={this.state.parejaSeleccionada} seleccionarCarta = {(carta) => this.seleccionarCarta(carta)}/>
+              <Carta />
+            </div>
+          )
+        }
+
+        seleccionarCarta(carta, event) {
+            if (this.state.estaComparando || this.state.parejaSeleccionada.indexOf(carta) > -1 || carta.fueAdivinida){
+                return;
+            }
+
+            var element = event.currentTarget;
+            if (element.className === "flip-card"){
+                element.style.transform = "rotateY(180deg)"
+            }
+
+            const parejaSeleccionada = [...this.state.parejaSeleccionada, carta]
+            this.setState({
+                parejaSeleccionada
+            })
+
+        }
+      }
+      
+      ReactDOM.render(
+        <Game />,
+        document.getElementById('root')
+      )
+    </script>
+  </body>
+</html>
