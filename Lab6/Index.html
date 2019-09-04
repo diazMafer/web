@@ -6,7 +6,6 @@
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin>
   </head>  
   <body>
     <div id="root"></div>
@@ -32,9 +31,9 @@
           return <header style={style}>
                     <div> Juego memoria - Cartoon Network</div>
                     <div>
-                        <button>Volver a jugar </button>
+                        <button onClick = {this.props.iniciarPartida}>Volver a jugar </button>
                     </div>
-                    <div> Intentos: </div>
+                    <div> Intentos: {this.props.numeroIntentos} </div>
                 </header>
         }
       }
@@ -46,46 +45,46 @@
       
       const numeroCartas = 20; 
       function barajear() { 
-          const fontAwesomeClass = iconos()
+          const imagenes = iconos()
           let cartas = []
-
           while (cartas.length < numeroCartas){
-              const index = Math.floor(Math.random() * fontAwesomeClass.length)
+              const index = Math.floor(Math.random() * imagenes.length)
               const carta = {
-                  icono: fontAwesomeClass.splice(index, 1)[0],
-                  fueAdivinida: false
+                  id: Math.random(),
+                  icono: imagenes.splice(index, 1)[0],
+                  fueAdivinada: false
 
               }
 
               cartas.push(carta)
+
+              const carta2 = {
+                id: Math.random(),
+                icono: carta.icono,
+                fueAdivinada: false
+              }
               //funciona para clonar la carta y que cuando le di click a una no se vaya a voltear ambas cartas
-              cartas.push({...carta})
+              cartas.push(carta2)
           }
           
           return shuffle(cartas)
       }
 
-      function iconos() { return ["fa-rmb", "fa-road", "fa-rocket", "fa-rotate-left", "fa-rotate-right", "fa-rouble", "fa-rss", 
-      "fa-rss-square", "fa-rub", "fa-ruble", "fa-rupee", "fa-save", "fa-scissors", "fa-search", "fa-search-minus", "fa-search-plus", "fa-sellsy", "fa-send", "fa-send-o", 
-      "fa-server", "fa-share", "fa-share-alt", "fa-share-alt-square", "fa-share-square", "fa-share-square-o", "fa-shekel", "fa-sheqel", "fa-shield", "fa-ship", 
-      "fa-shirtsinbulk", "fa-shopping-cart", "fa-sign-in", "fa-sign-out", "fa-signal", "fa-simplybuilt", "fa-sitemap", "fa-skyatlas", "fa-skype", "fa-slack", "fa-sliders", 
-      "fa-slideshare", "fa-smile-o", "fa-soccer-ball-o", "fa-sort", "fa-sort-alpha-asc", "fa-sort-asc", 
-      "fa-sort-desc", "fa-sort-down", "fa-sort-numeric-asc", "fa-sort-numeric-desc", "fa-sort-up", "fa-soundcloud", "fa-space-shuttle", "fa-spinner", "fa-spoon", 
-      "fa-spotify", "fa-square", "fa-square-o", "fa-stack-exchange", "fa-stack-overflow", "fa-star", "fa-star-half", "fa-star-half-empty", "fa-star-half-full", 
-      "fa-star-half-o", "fa-star-o", "fa-steam", "fa-steam-square", "fa-step-backward", "fa-step-forward", "fa-stethoscope", "fa-stop", "fa-street-view", "fa-strikethrough"] }
+      function iconos() { return ["Card1.png", "Card2.png", "Card3.png", "Card4.png", "Card5.png", "Card6.png", "Card7.png",
+                                    "Card8.png", "Card9.png", "Card10.png", "Card11.png"] }
       
       const getEstadoInicial = () => {
           const baraja = barajear()
           return {
               baraja,
               parejaSeleccionada: [],
-              estaComparando: false
-
+              estaComparando: false,
+              numeroIntentos: 0
           }
       }
       class Tablero extends React.Component {
         render() {
-          const cartas = [1,2,3,4,5]
+          
           const style = {
             color: 'white',
             width: '700px',
@@ -101,8 +100,8 @@
                        this.props.baraja.map((carta, index) => {
                            //se verifica si la carta que viene esta en el array de parejas seleccionadas por el usuario
                            const comparada  = this.props.parejaSeleccionada.indexOf(carta) > -1
-                           return  <Carta icono={carta.icono} comparada = {comparada} key={index} seleccionarCarta = {() => this.props.seleccionarCarta(carta, )}
-                                        fueAdivinida = {carta.fueAdivinida}/>
+                           return  <Carta icono={carta.icono} id={carta.id} comparada = {comparada} key={index} seleccionarCarta = {() => this.props.seleccionarCarta(carta)}
+                                        fueAdivinada = {carta.fueAdivinada} flipped={this.props.parejaSeleccionada.filter((carta2) => carta2.id === carta.id).length > 0}/>
                        })
                     }
                 </div>
@@ -110,6 +109,11 @@
       }
       
       class Carta extends React.Component {
+        constructor(){
+          super()
+          this.flipC = React.createRef()
+          this.flipI = React.createRef()
+        }
         render() {
           const style = {
             width: '125px',
@@ -144,15 +148,46 @@
             boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)'
           }
 
-          return <div className="flip-card" style={style} onClick={this.props.seleccionarCarta}>
-                    <div className="flip-card-inner" style={inner}
-                         flipped = {this.props.comparada || this.props.fueAdivinida}
-                         disabled = {true}>
-                        <div className = "front" style ={front} />
-                        <div className = "back" style = {back}>
-                            <i className={`fa ${this.props.icono} fa-5x`}></i>
-                        </div>
+          const img = {
+            width: '100%',
+            height: '100%'
+          }
+
+          const innerFlip = {
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            transition: 'transform 0.6s',
+            transformStyle: 'preserve-3d',
+            boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+            transform: 'rotateY(180deg)'
+          }
+        
+          return <div className="flip-card"  style={style} onClick={this.props.seleccionarCarta}>
+                    {this.props.flipped || this.props.fueAdivinada?
+                    <div className="flip-card-inner"  style={innerFlip}
+                         disabled = {true}
+                         flipped2 = {this.props.comparada || this.props.fueAdivinada}
+                         >
+                         {this.props.flipped || this.props.fueAdivinada? 
+                            <div className = "back" style = {back}>
+                                <img src={this.props.icono} width="100%" height="100%"></img>
+                            </div> :
+                            <div className = "front" style ={front} />
+                        }    
+                    </div> : 
+                    <div className="flip-card-inner"  style={inner}
+                         disabled = {true}
+                         flipped2 = {this.props.comparada || this.props.fueAdivinada}
+                         >
+                         {this.props.flipped || this.props.fueAdivinada? 
+                            <div className = "back" style = {back}>
+                                <img src={this.props.icono} width="100%" height="100%"></img>
+                            </div> :
+                            <div className = "front" style ={front} />
+                        }    
                     </div>
+                    }
                  </div>
         }
       }
@@ -160,9 +195,8 @@
       class Game extends React.Component {
         constructor(props) {
           super(props)
-          
           this.state = getEstadoInicial()
-          
+
         }
 
         render() {
@@ -172,29 +206,74 @@
           }
           return (
             <div style={style} >
-              <Header />
+              <Header numeroIntentos = {this.state.numeroIntentos}
+                      iniciarPartida = {() => this.iniciarPartida()}/>
               <Tablero  baraja={this.state.baraja} parejaSeleccionada={this.state.parejaSeleccionada} seleccionarCarta = {(carta) => this.seleccionarCarta(carta)}/>
-              <Carta />
             </div>
           )
         }
 
-        seleccionarCarta(carta, event) {
-            if (this.state.estaComparando || this.state.parejaSeleccionada.indexOf(carta) > -1 || carta.fueAdivinida){
-                return;
+        seleccionarCarta(carta) {  
+            if (this.state.estaComparando || this.state.parejaSeleccionada.indexOf(carta) > -1 || carta.fueAdivinada){
+                return
             }
-
-            var element = event.currentTarget;
-            if (element.className === "flip-card"){
-                element.style.transform = "rotateY(180deg)"
-            }
-
             const parejaSeleccionada = [...this.state.parejaSeleccionada, carta]
             this.setState({
                 parejaSeleccionada
-            })
+            });
 
+            if(parejaSeleccionada.length === 2){
+              this.compararPareja(parejaSeleccionada)
+            }
         }
+            
+        compararPareja(parejaSeleccionada){
+          this.setState({estaComparando: true})
+          setTimeout(() => {
+            const [primeraCarta, segundaCarta] = parejaSeleccionada
+            let baraja = this.state.baraja
+
+            if(primeraCarta.icono === segundaCarta.icono){
+              baraja = baraja.map((carta) => {
+                if(carta.icono !== primeraCarta.icono){
+                  return carta
+
+                }
+                //agarra la carta y expande sus propiedades lo que permite modificarlas
+                return {...carta, fueAdivinada: true}
+              });
+            
+            }
+            this.verificarGanador(baraja)
+            this.setState({
+              parejaSeleccionada: [],
+              baraja,
+              estaComparando: false,
+              numeroIntentos: this.state.numeroIntentos + 1
+            })
+          }, 1000);
+        }
+
+        verificarGanador(baraja){
+          if (
+            baraja.filter((carta) =>  !carta.fueAdivinada).length === 0
+            )
+          {
+            alert('Ganaste en {this.props.numeroIntentos} intentos')
+          }
+        }
+      
+       iniciarPartida(){
+         const baraja = barajear()
+         this.setState({
+           baraja,
+           parejaSeleccionada: [],
+           estaComparando: false,
+           numeroIntentos: 0
+         })
+        
+       }
+
       }
       
       ReactDOM.render(
