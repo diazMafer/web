@@ -6,13 +6,18 @@
   "scripts": {
     "start": "webpack-dev-server",
     "test": "eslint src/components/*",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook -c .storybook -o .out"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@storybook/addon-knobs": "^5.2.4",
+    "@storybook/addon-storysource": "^5.2.4",
+    "@storybook/theming": "^5.2.4",
     "babel-eslint": "^10.0.3",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.0",
@@ -28,6 +33,11 @@
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-react": "^7.0.0",
+    "@storybook/addon-actions": "^5.2.4",
+    "@storybook/addon-links": "^5.2.4",
+    "@storybook/addon-viewport": "^5.2.4",
+    "@storybook/addons": "^5.2.4",
+    "@storybook/react": "^5.2.4",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.2.0",
     "eslint": "^6.5.1",
